@@ -22,16 +22,7 @@
     "rn-fetch-blob": "^0.12.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.25.2"
+    "@babel/core": "^7.9.0"
   },
-  "private": true,
-  "expo": {
-    "doctor": {
-      "reactNativeDirectoryCheck": {
-        "exclude": [
-          "node_modules/react-native-mutual-tls"
-        ]
-      }
-    }
-  }
+  "private": true
 }
