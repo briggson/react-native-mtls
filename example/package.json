@@ -3,28 +3,35 @@
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
-    "web": "expo start --web",
     "start": "react-native start"
   },
   "dependencies": {
-    "expo": "~42.0.1",
-    "expo-splash-screen": "~0.11.2",
-    "expo-status-bar": "~1.0.4",
-    "expo-updates": "~0.8.1",
-    "react": "16.13.1",
-    "react-dom": "16.13.1",
-    "react-native": "~0.63.4",
-    "react-native-gesture-handler": "~1.10.2",
-    "react-native-keychain": "^6.1.1",
-    "react-native-mutual-tls": "link:../",
-    "react-native-reanimated": "~2.2.0",
-    "react-native-screens": "~3.4.0",
-    "react-native-unimodules": "~0.14.5",
-    "react-native-web": "~0.13.12",
+    "expo": "^52.0.23",
+    "expo-splash-screen": "^0.29.18",
+    "expo-status-bar": "^2.0.0",
+    "expo-updates": "^0.26.10",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-native": "^0.76.5",
+    "react-native-gesture-handler": "~2.20.2",
+    "react-native-keychain": "^9.2.2",
+    "react-native-mutual-tls": "file:../",
+    "react-native-reanimated": "^3.16.6",
+    "react-native-screens": "^4.4.0",
+    "react-native-web": "^0.19.13",
     "rn-fetch-blob": "^0.12.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.9.0"
+    "@babel/core": "^7.25.2"
   },
-  "private": true
+  "private": true,
+  "expo": {
+    "doctor": {
+      "reactNativeDirectoryCheck": {
+        "exclude": [
+          "node_modules/react-native-mutual-tls"
+        ]
+      }
+    }
+  }
 }
