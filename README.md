@@ -36,6 +36,8 @@ The certificate and password are expected to be loaded into the native Keychain 
 
 ## Usage
 
+### Ios
+
 Import the `MutualTLS` module, as well as the `Keychain` module.
 
 ```javascript
@@ -83,6 +85,20 @@ await MutualTLS.configure({
   keychainServiceForPassword: 'my-tls.client.p12.password',
 });
 ```
+
+### Android
+
+```javascript
+const myP12DataBase64 = "YOUR P12 FILE ENCODED AS BASE64 GOES HERE";
+const myPassword = "THE PASSWORD TO DECRYPT THE P12 FILE GOES HERE";
+
+MutualTLS.configure({
+  certificateFileP12: myP12DataBase64,
+  certificatePassword: myPassword,
+});
+```
+
+### Test
 
 Assuming you've done all that setup, then you're ready to make secure Mutual TLS requests with a server that is configured to trust the client certificate you provided.
 
