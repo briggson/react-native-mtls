@@ -15,6 +15,7 @@ import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Arrays;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.KeyManagerFactory;
@@ -78,16 +79,15 @@ public class CustomClientFactory implements OkHttpClientFactory {
                     .cookieJar(new ReactCookieJarContainer());
 
             // Enable TLS v1.3 and v1.2
-            ConnectionSpec spec = new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
-                    .tlsVersions(TlsVersion.TLS_1_3, TlsVersion.TLS_1_2)
-                    .build();
+            // ConnectionSpec spec = new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
+            //         .tlsVersions(TlsVersion.TLS_1_3, TlsVersion.TLS_1_2)
+            //         .build();
 
-            builder.connectionSpecs(Arrays.asList(spec, ConnectionSpec.COMPATIBLE_TLS));
+            // builder.connectionSpecs(Arrays.asList(spec, ConnectionSpec.COMPATIBLE_TLS));
 
             builder.addInterceptor(new CustomInterceptor());
 
             return builder.build();
-
         } catch (Exception e) {
             Log.e(TAG, "Error creating OkHttpClient: " + e.getMessage());
             throw new RuntimeException("Failed to create OkHttpClient", e);
