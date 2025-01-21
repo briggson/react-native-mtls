@@ -109,3 +109,8 @@ const response = await fetch('https://my-secure.example.com/');
 ```
 
 To see and run a fully working demonstration using `https://client.badssl.com/` as the test server, see [the example project in this repository](./example).
+
+### Contributors
+
+- [willerrodrigo](https://github.com/willerrodrigo)
+- [undeaDD](https://github.com/undeaDD)
