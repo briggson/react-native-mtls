@@ -1,33 +1,56 @@
 {
   "name": "react-native-mtls",
-  "title": "React Native Mutual Tls",
+  "title": "React Native Mutual TLS",
   "version": "1.0.0",
-  "description": "TODO",
+  "description": "Mutual TLS authentication for HTTP requests in React Native and Expo",
   "main": "index.js",
+  "types": "index.d.ts",
   "files": [
     "README.md",
     "android",
     "index.js",
+    "index.d.ts",
     "ios",
-    "react-native-mutual-tls.podspec"
+    "react-native-mtls.podspec",
+    "expo-module.config.js"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "expo-module build",
+    "clean": "expo-module clean"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/github_account/react-native-mutual-tls.git",
-    "baseUrl": "https://github.com/github_account/react-native-mutual-tls"
+    "url": "git+https://github.com/briggson/react-native-mtls.git",
+    "baseUrl": "https://github.com/briggson/react-native-mtls"
   },
   "keywords": [
-    "react-native"
+    "react-native",
+    "expo",
+    "expo-module",
+    "mutual-tls",
+    "mTLS",
+    "client-certificate",
+    "ssl",
+    "tls"
   ],
   "author": {
-    "name": "Your Name",
-    "email": "yourname@email.com"
+    "name": "Briggson Verdugo",
+    "email": "briggsonverdugo@gmail.com"
   },
   "license": "MIT",
   "licenseFilename": "LICENSE",
   "readmeFilename": "README.md",
-  "packageManager": "yarn@1.22.21+sha1.1959a18351b811cdeedbd484a8f86c3cc3bbaf72"
+  "packageManager": "yarn@1.22.21+sha1.1959a18351b811cdeedbd484a8f86c3cc3bbaf72",
+  "peerDependencies": {
+    "expo": ">=49.0.0",
+    "react": "*",
+    "react-native": "*"
+  },
+  "devDependencies": {
+    "@expo/config": "~8.5.0",
+    "@expo/module-autolinking": "~1.11.0",
+    "expo": "^50.0.0",
+    "expo-module-scripts": "~3.5.0"
+  }
 }

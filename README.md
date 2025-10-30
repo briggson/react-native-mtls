@@ -1,28 +1,40 @@
-# react-native-mutual-tls
+# react-native-mtls
 
-Mutual TLS authentication for HTTP requests in React Native.
+Mutual TLS authentication for HTTP requests in React Native and Expo.
 
-The client certificate and associated password are stored securely in the native Keychain.
+The client certificate and associated password are stored securely in the native Keychain (iOS) or provided directly (Android).
 
-Once the module is set up, it applies to all normal react-native HTTP requests (e.g. through `fetch`, `XMLHttpRequest`, or any library that uses these) for HTTPS connections that ask for a client certificate. There is no overhead for connections that do not request a client certificate.
+Once the module is set up, it applies to all normal HTTP requests (e.g. through `fetch`, `XMLHttpRequest`, or any library that uses these) for HTTPS connections that ask for a client certificate. There is no overhead for connections that do not request a client certificate.
 
-Only iOS is supported at this time, but pull requests are welcome if anyone wants to help add support for Android.
+Supports both iOS and Android, and is compatible with Expo SDK 49+.
 
-## Getting started
+## Installation
 
-Install it as a dependency for your react-native project. You'll probably also need the native module for `Keychain` unless you have some other way of getting the secrets into the keychain:
+### For Expo projects (SDK 49+)
 
 ```sh
-npm i https://github.com/Maybanker/react-native-mtls
-npm i react-native-keychain
-npx pod-install
+npx expo install react-native-mtls
 ```
 
-OR
+### For React Native CLI projects
 
 ```sh
-yarn add https://github.com/Maybanker/react-native-mtls
+npm install react-native-mtls
+# or
+yarn add react-native-mtls
+```
+
+For iOS, you'll also need a Keychain management solution:
+
+```sh
+npm install react-native-keychain
+# or
 yarn add react-native-keychain
+```
+
+Then run pod install:
+
+```sh
 npx pod-install
 ```
 
@@ -36,27 +48,23 @@ The certificate and password are expected to be loaded into the native Keychain 
 
 ## Usage
 
-### Ios
-
-Import the `MutualTLS` module, as well as the `Keychain` module.
+Import the `MutualTLS` module:
 
 ```javascript
-import MutualTLS from 'react-native-mutual-tls';
+import MutualTLS from 'react-native-mtls';
+```
+
+### iOS Setup
+
+For iOS, you'll need to store the certificate and password in the Keychain. Import the Keychain module:
+
+```javascript
 import Keychain from 'react-native-keychain';
 ```
 
-Optionally, set up debug information and errors from this module to go to the console for troubleshooting purposes. You could also provide different functions here if you wanted to do something else with the events.
+Before making a request, you'll need to load the secrets into the Keychain.
 
-If you don't do this, there will be no logging of such events.
-
-```javascript
-MutualTLS.onDebug(console.debug);
-MutualTLS.onError(console.error);
-```
-
-Before making a request, you'll need to load the secrets into the `Keychain`.
-
-Refer to [the documentation for the `Keychain` module](https://github.com/oblador/react-native-keychain) for more information about managing secrets in the keychain, how to clear the secrets, and how to check whether the secrets are already loaded to avoid doing work to load them every time the app starts.
+Refer to [the documentation for the `Keychain` module](https://github.com/oblador/react-native-keychain) for more information about managing secrets in the keychain.
 
 ```javascript
 const myP12DataBase64 = "YOUR P12 FILE ENCODED AS BASE64 GOES HERE";
@@ -68,33 +76,58 @@ await Promise.all([
 ]);
 ```
 
-Next you need to call `MutualTLS.configure` to tell the module where to find the secrets in the keychain.
-
-`MutualTLS` will not pre-load the secrets when configured - they will be loaded on the fly each time they are needed by an authentication challenge, so there is no need to call `MutualTLS.configure` more than once even if the secret values change.
-
-If you do not call `MutualTLS.configure`, then the following defaults are used:
-- `keychainServiceForP12`: `mutual-tls.client.p12`
-- `keychainServiceForPassword`: `mutual-tls.client.p12.password`
-
-If you're using `MutualTLS` in a test environment with a proxied connection where the server name does not match the server name in the server certificate, you can also set the `insecureDisableVerifyServerInRootDomain` option to the root domain for which you want to insecurely trust all subdomains. For example, setting it to `example.com` would let you insecurely trust servers at a domain like `bad.example.com`. _DO NOT USE THIS SETTING IN A PRODUCTION ENVIRONMENT_, as it defeats server authentication security features which form the other half of the "mutual" part of Mutual TLS.
+Next configure the MutualTLS module to tell it where to find the secrets in the keychain:
 
 ```javascript
-// Use the same service names that were used in `Keychain.setGenericPassword`
 await MutualTLS.configure({
   keychainServiceForP12: 'my-tls.client.p12',
   keychainServiceForPassword: 'my-tls.client.p12.password',
 });
 ```
 
-### Android
+If you do not call `MutualTLS.configure`, then the following defaults are used:
+- `keychainServiceForP12`: `mutual-tls.client.p12`
+- `keychainServiceForPassword`: `mutual-tls.client.p12.password`
+
+### Android Setup
+
+For Android, provide the certificate data directly:
 
 ```javascript
 const myP12DataBase64 = "YOUR P12 FILE ENCODED AS BASE64 GOES HERE";
 const myPassword = "THE PASSWORD TO DECRYPT THE P12 FILE GOES HERE";
 
-MutualTLS.configure({
+await MutualTLS.configure({
   certificateFileP12: myP12DataBase64,
   certificatePassword: myPassword,
+});
+```
+
+### Optional: Debug and Error Callbacks
+
+You can set up debug and error callbacks for troubleshooting:
+
+```javascript
+MutualTLS.onDebug((message, data) => {
+  console.debug('MutualTLS Debug:', message, data);
+});
+
+MutualTLS.onError((message, data) => {
+  console.error('MutualTLS Error:', message, data);
+});
+```
+
+### Test Environment Configuration
+
+If you're using MutualTLS in a test environment with a proxied connection where the server name does not match the server name in the server certificate, you can set the `insecureDisableVerifyServerInRootDomain` option to the root domain for which you want to insecurely trust all subdomains. For example, setting it to `example.com` would let you insecurely trust servers at a domain like `bad.example.com`.
+
+⚠️ **DO NOT USE THIS SETTING IN A PRODUCTION ENVIRONMENT**, as it defeats server authentication security features which form the other half of the "mutual" part of Mutual TLS.
+
+```javascript
+await MutualTLS.configure({
+  keychainServiceForP12: 'my-tls.client.p12',
+  keychainServiceForPassword: 'my-tls.client.p12.password',
+  insecureDisableVerifyServerInRootDomain: 'example.com', // Only for testing!
 });
 ```
 

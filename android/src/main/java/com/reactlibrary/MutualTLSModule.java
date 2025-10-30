@@ -1,9 +1,10 @@
 package com.reactlibrary;
 
-import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.bridge.ReactContextBaseJavaModule;
-import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.bridge.Callback;
+import expo.modules.core.ModuleRegistry;
+import expo.modules.core.ExpoModule;
+import expo.modules.core.Promise;
+import expo.modules.core.ExpoMethod;
+
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.modules.network.NetworkingModule;
 
@@ -16,13 +17,10 @@ import okhttp3.TlsVersion;
 import java.util.Arrays;
 import java.util.List;
 
-public class MutualTLSModule extends ReactContextBaseJavaModule {
+public class MutualTLSModule extends ExpoModule {
 
-    private final ReactApplicationContext reactContext;
-
-    public MutualTLSModule(ReactApplicationContext reactContext) {
-        super(reactContext);
-        this.reactContext = reactContext;
+    public MutualTLSModule() {
+        super();
     }
 
     @Override
@@ -30,18 +28,31 @@ public class MutualTLSModule extends ReactContextBaseJavaModule {
         return "MutualTLS";
     }
 
-    @ReactMethod
-    public void configure(ReadableMap readableMap) {
-        String certificateFileP12 = readableMap.getString("certificateFileP12");
-        String certificatePassword = readableMap.getString("certificatePassword");
-        CustomClientFactory factory = new CustomClientFactory(certificateFileP12, certificatePassword);
-        NetworkingModule.setCustomClientBuilder(builder -> {
-          OkHttpClient customClient = factory.createNewNetworkModuleClient();
-          builder.sslSocketFactory(customClient.sslSocketFactory(), (X509TrustManager) customClient.x509TrustManager());
-          builder.cookieJar(customClient.cookieJar());
-          builder.addInterceptor(customClient.interceptors().get(0));
-          builder.connectionSpecs(createConnectionSpecs());
-        });
+    @ExpoMethod
+    public void configure(ReadableMap readableMap, Promise promise) {
+        try {
+            String certificateFileP12 = readableMap.getString("certificateFileP12");
+            String certificatePassword = readableMap.getString("certificatePassword");
+            CustomClientFactory factory = new CustomClientFactory(certificateFileP12, certificatePassword);
+
+            // Get the NetworkingModule from the module registry
+            ModuleRegistry registry = getModuleRegistry();
+            NetworkingModule networkingModule = (NetworkingModule) registry.getModule(NetworkingModule.class);
+
+            if (networkingModule != null) {
+                networkingModule.setCustomClientBuilder(builder -> {
+                    OkHttpClient customClient = factory.createNewNetworkModuleClient();
+                    builder.sslSocketFactory(customClient.sslSocketFactory(), (X509TrustManager) customClient.x509TrustManager());
+                    builder.cookieJar(customClient.cookieJar());
+                    builder.addInterceptor(customClient.interceptors().get(0));
+                    builder.connectionSpecs(createConnectionSpecs());
+                });
+            }
+
+            promise.resolve(null);
+        } catch (Exception e) {
+            promise.reject("CONFIGURE_ERROR", e.getMessage(), e);
+        }
     }
 
     private List<ConnectionSpec> createConnectionSpecs() {
